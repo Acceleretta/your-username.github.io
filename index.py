@@ -7,7 +7,7 @@ app.config['SECRET_KEY'] = 'your secret key'
 
 @app.route('/')
 def index():
-    return render_template('base.html')
+    return render_template('index.html')
 
 
 @app.route('/login')
