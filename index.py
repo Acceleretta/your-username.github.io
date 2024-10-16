@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, send_file
-from modelo.modelo import *
+from flask import Flask, render_template, request, redirect, flash, url_for
+
+from src.controllers.clientes_controller import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your secret key'
@@ -10,30 +11,30 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/login')
-def login():
-    return render_template('loginEstudiante.html')
+@app.route('/ver_cliente')
+def ver_cliente():
+    clientes = obtener_cliente()
+    return render_template("obtener_cliente.html", clientes=clientes)
 
 
-@app.route('/proyectos_disponibles')
-def proyectos_disponibles():
-    return render_template('proyectos_disponibles.html')
+@app.route('/agregar_cliente')
+def formulario_agregar_cliente():
+    return render_template("agregar_cliente.html")
 
 
-@app.route('/guardar_datos', methods=['POST'])
-def guardar_datos():
-    nombre_completo = request.form['nombreCompleto']
-    correo_electronico = request.form['correoElectronico']
-    contrasena = request.form['contrasena']
-    area_conocimiento = request.form['areaConocimiento']
-    disciplina = request.form['disciplina']
-    subdisciplina = request.form['subdisciplina']
+@app.route("/eliminar_cliente", methods=["POST"])
+def eliminar_cliente():
+    borrar_cliente(request.form["id"])
+    return redirect("/ver_cliente")
 
-    # Puedes guardar los datos en una base de datos aquí, o realizar cualquier otra acción necesaria
-    vector_doctores = llamaModelo([area_conocimiento, disciplina, subdisciplina])
-    # Luego, renderiza una nueva plantilla con los datos guardados
-    return render_template('doctores.html', doctores=vector_doctores)
 
+@app.route("/guardar_cliente", methods=["POST"])
+def guardar_cliente():
+    insertar_cliente(request.form["nombre"], request.form["apellido_paterno"], request.form["apellido_materno"],
+                     request.form["fecha_nacimiento"], request.form["telefono"], request.form["correo"])
+    flash("Cliente guardado exitosamente!", "success")
+
+    return redirect(url_for('formulario_agregar_cliente'))
 
 
 app.run(host='0.0.0.0', port=81)
